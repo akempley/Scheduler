@@ -23,24 +23,45 @@
         </form>
     </section>
 
-    <table border="1" style="width: 80%; margin: 20px auto; text-align: left; border-collapse: collapse;">
-        <thead style="background-color: #eee;">
-            <tr>
-                <th>Status</th>
-                <th>Task</th>
-                <th>Category</th>
-                <th>Due Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for task in tasks %}
-                <tr>
-                    <td>{{ "✅" if task.is_completed else "⏳" }}</td>
+<table border="1" style="width: 80%; margin: 20px auto; text-align: left; border-collapse: collapse;">
+    <thead style="background-color: #eee;">
+        <tr>
+            <th>Status</th>
+            <th>Task</th>
+            <th>Category</th>
+            <th>Due Date</th>
+            <th>Actions</th> 
+        </tr>
+    </thead>
+    <tbody>
+        {% for task in tasks %}
+            {# This logic checks: Is the due date today or in the future? #}
+            {# 'today' comes from the Python route we updated earlier #}
+            {% if task.due_date >= today %}
+                <tr class="{{ 'completed-text' if task.is_completed else '' }}">
+                    
+                    <td style="text-align: center; font-size: 1.5rem;">
+                        {% if task.is_completed %}
+                            <span style="text-shadow: 0 0 10px #bf5af2;">✅</span>
+                        {% else %}
+                            <span style="opacity: 0.6;">⏳</span>
+                        {% endif %}
+                    </td>
+                    
                     <td>{{ task.title }}</td>
                     <td>{{ task.category }}</td>
                     <td>{{ task.due_date }}</td>
+
+                    <td>
+                        <a href="{{ url_for('complete_task', index=loop.index0) }}">
+                            <button type="button">
+                                {{ "Undo" if task.is_completed else "Done" }}
+                            </button>
+                        </a>
+                    </td>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

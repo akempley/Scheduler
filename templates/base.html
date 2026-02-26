@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AAron's Planner{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/scheduler.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Pacifico&display=swap" rel="stylesheet">
+</head>
+
+    <nav>
+    <a href="/">My Scheduler</a> 
+</nav>
+
+    <hr>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2026 AAron's Personal Scheduler</p>
+    </footer>
+
+</body>
+</html>
