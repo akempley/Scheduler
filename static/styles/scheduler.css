@@ -1,3 +1,18 @@
+@font-face {
+    font-family: 'NeonLights'; /* nickname  */
+    src: url('../fonts/neon.ttf')format('truetype');
+}
+
+h1, h3 {
+    font-family: 'NeonLights', sans-serif;
+    color: #fff;
+    text-align: center;
+    /* This adds that "glow" effect to the text */
+    text-shadow: 0 0 5px #fff, 
+                 0 0 10px #bf5af2, 
+                 0 0 20px #bf5af2;
+}
+
 /* Midnight Studio - Stylized Edition */
 body {
     background-color: #0f0f0f;
@@ -34,8 +49,9 @@ body::before {
 }
 
 h1 {
-    font-family: 'Pacifico', cursive;
+    font-family: 'NeonLights', sans-serif;
     font-size: 3.5rem;
+    text-align: center;
     /* This creates the "liquid neon" gradient look inside the letters */
     background: linear-gradient(to bottom, #f0b3ff 0%, #bf5af2 50%, #8c26bc 100%);
     -webkit-background-clip: text;
@@ -44,6 +60,9 @@ h1 {
     /* Layered Glow for 3D depth */
     filter: drop-shadow(0 0 5px rgba(191, 90, 242, 0.8)) 
             drop-shadow(0 0 20px rgba(191, 90, 242, 0.4));
+    text-shadow: 0 0 5px #fff, 
+                 0 0 10px #bf5af2;
+
     margin-bottom: 40px;
 }
 
