@@ -5,27 +5,29 @@
 {% block content %}
 <h1>My Schedule</h1>
 
-<section style="margin: 20px auto; width: 80%; padding: 15px; background: #1a1a1a; color: white; border-radius: 8px;">
-    <div id='calendar' style="max-width: 600px; margin: 0 auto; background: white; color: black; padding: 10px; border-radius: 5px;"></div>
-</section>
+<div class="dashboard-container">
+    <section id="calendar-section">
+        <div id='calendar'></div>
+    </section>
 
-<section style="margin: 20px auto; width: 80%; padding: 15px; border: 1px solid #ccc; border-radius: 8px;">
-    <h3>Add New Task</h3>
-    <form action="/add_task" method="POST">
-        <input type="text" name="title" placeholder="Assignment Name" required style="padding: 5px;">
-        
-        <select name="category" style="padding: 5px;">
-            <option value="School">School</option>
-            <option value="Work">Work</option>
-            <option value="Medical">Medical</option>
-            <option value="Personal">Personal</option>
-        </select>
-        
-        <input type="date" name="due_date" required style="padding: 5px;">
-        
-        <button type="submit" style="padding: 5px 15px; cursor: pointer;">Add to List</button>
-    </form>
-</section>
+    <section id="task-form-section"> 
+        <h3>Add New Task</h3>
+        <form action="/add_task" method="POST">
+            <input type="text" name="title" placeholder="Assignment Name" required>
+            
+            <select name="category">
+                <option value="School">School</option>
+                <option value="Work">Work</option>
+                <option value="Medical">Medical</option>
+                <option value="Personal">Personal</option>
+            </select>
+            
+            <input type="date" name="due_date" required>
+            
+            <button type="submit">Add to List</button>
+        </form>
+    </section>
+</div>
 
 <table border="1" style="width: 80%; margin: 20px auto; text-align: left; border-collapse: collapse;">
     <thead style="background-color: #eee;">
@@ -70,6 +72,7 @@
     var calendarEl = document.getElementById('calendar');
     var calendar = new FullCalendar.Calendar(calendarEl, {
       initialView: 'dayGridMonth',
+      height: 'auto',
       events: [
         {% for task in tasks %}
         {
@@ -84,4 +87,3 @@
   });
 </script>
 {% endblock %}
-
