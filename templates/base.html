@@ -4,23 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}AAron's Planner{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/scheduler.css') }}">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/scheduler.css') }}?v=1.1">
+    
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Pacifico&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 </head>
-
-    <nav>
-    <a href="/">My Scheduler</a> 
-</nav>
-
-    <hr>
+<body> 
+    <nav style="padding: 10px; background: rgba(0,0,0,0.3);">
+        <a href="/" style="color: #bf5af2; text-decoration: none; font-weight: bold;">My Scheduler</a> 
+    </nav>
 
     <main>
         {% block content %}
         {% endblock %}
     </main>
 
-    <footer>
+    <footer style="text-align: center; padding: 20px; color: #666;">
         <p>&copy; 2026 AAron's Personal Scheduler</p>
     </footer>
 

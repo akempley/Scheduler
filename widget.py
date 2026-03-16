@@ -10,14 +10,25 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
+# --- PYINSTALLER PATH FIX ---
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
 SCOPES = ['https://www.googleapis.com/auth/calendar.events']
-db_path = '/Applications/Productivity Tool/scheduler.db'
+
+# Updated to use the resource_path helper
+db_path = resource_path('scheduler.db')
+creds_path = resource_path('credentials.json')
+token_path = resource_path('token.json')
 
 def sync_to_google(task_title, due_date):
     creds = None
-    token_path = os.path.join(os.path.dirname(db_path), 'token.json')
-    creds_path = os.path.join(os.path.dirname(db_path), 'credentials.json')
-
     if os.path.exists(token_path):
         creds = Credentials.from_authorized_user_file(token_path, SCOPES)
     
@@ -108,7 +119,8 @@ class SoloSchedulerWidget(QWidget):
     def add_task_to_db(self):
         task_text = self.task_input.text().strip()
         picked_date = self.date_input.date().toString("yyyy-MM-dd")
-        if not task_text: return
+        if not task_text: 
+            return
 
         try:
             conn = sqlite3.connect(db_path, timeout=10) 
@@ -118,12 +130,22 @@ class SoloSchedulerWidget(QWidget):
             conn.commit()
             conn.close()
 
-            sync_to_google(task_text, picked_date)
             self.task_input.clear()
-            self.load_tasks()
-        except sqlite3.Error as e:
-            self.task_list.addItem(f"Add Error: {e}")
+            self.load_tasks() 
 
+            sync_success = sync_to_google(task_text, picked_date)
+            
+            if not sync_success:
+                self.title.setText("Saved Locally (Sync Failed)")
+            else:
+                self.title.setText("Synced to Google!")
+            
+            QTimer.singleShot(3000, lambda: self.title.setText("Solo Scheduler"))
+
+        except sqlite3.Error as e:
+            self.title.setText("DB Error!")
+            print(f"Database Error: {e}")
+            
     def archive_task(self, item):
         task_id = item.data(Qt.UserRole)
         try:

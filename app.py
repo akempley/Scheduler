@@ -1,8 +1,16 @@
 import os
+import datetime
 from flask import Flask, render_template, request, redirect, url_for
-from datetime import date
 from extensions import db
 from models import Task
+from datetime import date
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+
+# Same scope as the widget
+SCOPES = ['https://www.googleapis.com/auth/calendar.events']
 
 app = Flask(__name__)
 
@@ -11,6 +19,39 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////Applications/Productivity To
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
+def sync_to_google(task_title, due_date):
+    creds = None
+    # Pointing to your centralized folder
+    base_folder = '/Applications/Productivity Tool/'
+    token_path = os.path.join(base_folder, 'token.json')
+    creds_path = os.path.join(base_folder, 'credentials.json')
+
+    if os.path.exists(token_path):
+        creds = Credentials.from_authorized_user_file(token_path, SCOPES)
+    
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            # Note: This will open a browser tab on your Mac server
+            flow = InstalledAppFlow.from_client_secrets_file(creds_path, SCOPES)
+            creds = flow.run_local_server(port=0)
+        with open(token_path, 'w') as token:
+            token.write(creds.to_json())
+
+    try:
+        service = build('calendar', 'v3', credentials=creds)
+        event = {
+            'summary': task_title,
+            'description': 'Added via Flask Web Interface',
+            'start': {'date': due_date},
+            'end': {'date': due_date},
+        }
+        service.events().insert(calendarId='primary', body=event).execute()
+        return True
+    except Exception as e:
+        print(f"Flask Google Sync Error: {e}")
+        return False
 
 #still keeping my old work
 """my_scheduler = Scheduler("AAron")
@@ -35,14 +76,14 @@ def add_task():
     category = request.form.get('category')
     due_date = request.form.get('due_date')
 
+    # 1. Save to Database
     new_task = Task(title=title, category=category, due_date=due_date)
-
-    #my_scheduler.add_task(title, category, due_date)
     db.session.add(new_task)
     db.session.commit()
 
-    # THIS IS THE KEY: Send the user back to the home route
-    # 'show_scheduler' is the name of your function for the '/' route
+    # 2. Sync to Google Calendar
+    sync_to_google(title, due_date)
+
     return redirect(url_for('show_scheduler'))
 
 @app.route('/complete/<int:task_id>')
